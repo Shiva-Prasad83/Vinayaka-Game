@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { MISSIONS } from '../game/missions/missionData';
+import { MISSIONS, LEVEL_MISSIONS } from '../game/missions/missionData';
 import { saveToLocalStorage, loadFromLocalStorage } from '../utils/storage';
 
 const DEFAULT_INVENTORY = {
@@ -86,6 +86,34 @@ const useGameStore = create(
 
     // ─── LEVEL ─────────────────────────────────────────────────────────
     setCurrentLevel: (level) => set({ currentLevel: level }),
+
+    // Replay a previously completed level — strips its missions & spot
+    // progress from the store so all interactions work fresh again.
+    // completedLevels and rewards are preserved.
+    replayLevel: (level) => {
+      const levelMissionIds = LEVEL_MISSIONS[level] ?? [];
+      set((s) => {
+        // Remove this level's missions from completedMissions
+        const completedMissions = s.completedMissions.filter(
+          (id) => !levelMissionIds.includes(id)
+        );
+        // Remove this level's mission progress counters
+        const missionProgress = { ...s.missionProgress };
+        levelMissionIds.forEach((id) => delete missionProgress[id]);
+        // Remove per-spot keys so interaction spots reset visually
+        Object.keys(missionProgress).forEach((key) => {
+          if (key.startsWith('spot_') || key.startsWith('festlight_') || key.startsWith('celebrate_')) {
+            delete missionProgress[key];
+          }
+        });
+        return {
+          currentLevel: level,
+          completedMissions,
+          missionProgress,
+          currentMissionId: null,
+        };
+      });
+    },
 
     completeLevel: (level) =>
       set((s) => {

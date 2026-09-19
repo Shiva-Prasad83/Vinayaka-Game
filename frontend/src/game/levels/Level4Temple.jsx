@@ -122,71 +122,196 @@ export default function Level4Temple({ onStartPuzzle, onStartMusic, onStartModak
       <SceneLighting quality="medium" timeOfDay="evening" />
       <Ground size={80} color="#b8956a" />
 
-      {/* Temple main structure */}
-      <mesh position={[0, 2.5, -10]} castShadow>
-        <boxGeometry args={[14, 5, 10]} />
-        <meshStandardMaterial color="#f5deb3" roughness={0.7} />
+      {/* ── Temple interior floor ─────────────────────────────────────── */}
+      <mesh position={[0, 0.01, -10]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[14, 10]} />
+        <meshStandardMaterial color="#e8d5b0" roughness={0.9} />
       </mesh>
-      {/* Temple shikhara (tower) */}
-      <mesh position={[0, 6.5, -10]}>
-        <coneGeometry args={[3.5, 5, 8]} />
+      {/* Interior floor tile pattern */}
+      {[-4, 0, 4].map((x, i) => (
+        <mesh key={i} position={[x, 0.02, -10]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[3.5, 9.5]} />
+          <meshStandardMaterial color={i % 2 === 0 ? '#e0c898' : '#d4b880'} roughness={0.8} />
+        </mesh>
+      ))}
+
+      {/* ── Temple walls (open box — no ceiling, open front) ─────────── */}
+      {/* Back wall */}
+      <mesh position={[0, 2.5, -14.9]} castShadow receiveShadow>
+        <boxGeometry args={[14, 5, 0.4]} />
+        <meshStandardMaterial color="#f5deb3" roughness={0.7} side={2} />
+      </mesh>
+      {/* Left wall */}
+      <mesh position={[-6.8, 2.5, -10]} castShadow receiveShadow>
+        <boxGeometry args={[0.4, 5, 10]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.7} side={2} />
+      </mesh>
+      {/* Right wall */}
+      <mesh position={[6.8, 2.5, -10]} castShadow receiveShadow>
+        <boxGeometry args={[0.4, 5, 10]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.7} side={2} />
+      </mesh>
+      {/* Front wall — left section (beside left pillar) */}
+      <mesh position={[-5, 2.5, -5]} castShadow receiveShadow>
+        <boxGeometry args={[3.6, 5, 0.4]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.7} side={2} />
+      </mesh>
+      {/* Front wall — right section */}
+      <mesh position={[5, 2.5, -5]} castShadow receiveShadow>
+        <boxGeometry args={[3.6, 5, 0.4]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.7} side={2} />
+      </mesh>
+      {/* Front wall — top beam over entrance */}
+      <mesh position={[0, 4.3, -5]} castShadow>
+        <boxGeometry args={[7.2, 1.4, 0.4]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.7} />
+      </mesh>
+
+      {/* ── Ceiling (double-sided so visible from inside) ────────────── */}
+      <mesh position={[0, 5.05, -10]}>
+        <boxGeometry args={[14, 0.15, 10]} />
+        <meshStandardMaterial color="#e8cc98" roughness={0.8} side={2} />
+      </mesh>
+      {/* Ceiling beams */}
+      {[-4, -1.3, 1.3, 4].map((x, i) => (
+        <mesh key={i} position={[x, 4.92, -10]}>
+          <boxGeometry args={[0.35, 0.25, 10]} />
+          <meshStandardMaterial color="#c8a060" roughness={0.7} />
+        </mesh>
+      ))}
+
+      {/* ── Shikhara (tower) ─────────────────────────────────────────── */}
+      <mesh position={[0, 8, -10]}>
+        <coneGeometry args={[3.5, 6, 8]} />
         <meshStandardMaterial color="#dc143c" roughness={0.5} />
       </mesh>
-      {/* Sub towers */}
-      {[-4, 4].map((x, i) => (
+      {/* Shikhara base ring */}
+      <mesh position={[0, 5.1, -10]}>
+        <cylinderGeometry args={[3.8, 4.2, 0.5, 12]} />
+        <meshStandardMaterial color="#c81030" roughness={0.5} metalness={0.2} />
+      </mesh>
+
+      {/* ── Sub towers ───────────────────────────────────────────────── */}
+      {[-4.5, 4.5].map((x, i) => (
         <group key={i} position={[x, 0, -10]}>
-          <mesh position={[0, 4, 0]}>
+          <mesh position={[0, 5.5, 0]}>
             <coneGeometry args={[1.8, 3, 8]} />
             <meshStandardMaterial color="#ff8c00" roughness={0.5} />
           </mesh>
-          <mesh position={[0, 2.5, 0]}>
-            <boxGeometry args={[3.5, 5, 3.5]} />
+          <mesh position={[0, 4, 0]}>
+            <cylinderGeometry args={[2, 2.2, 3, 12]} />
             <meshStandardMaterial color="#f5deb3" roughness={0.7} />
           </mesh>
         </group>
       ))}
 
-      {/* Temple entrance steps */}
+      {/* ── Entrance steps ───────────────────────────────────────────── */}
       {[0, 1, 2].map((i) => (
-        <mesh key={i} position={[0, i * 0.12, -4.8 + i * 0.4]}>
-          <boxGeometry args={[6, 0.12, 1]} />
+        <mesh key={i} position={[0, i * 0.15, -4.6 + i * 0.45]} receiveShadow>
+          <boxGeometry args={[7, 0.15, 1.1]} />
           <meshStandardMaterial color="#d4b896" roughness={0.8} />
         </mesh>
       ))}
 
-      {/* Temple pillars */}
-      {[-2.5, -1, 1, 2.5].map((x, i) => (
-        <mesh key={i} position={[x, 1.5, -5]}>
-          <cylinderGeometry args={[0.22, 0.25, 3, 10]} />
-          <meshStandardMaterial color="#f0e0c0" roughness={0.6} />
-        </mesh>
+      {/* ── Interior pillars (4 inside) ───────────────────────────────── */}
+      {[-2.8, -0.9, 0.9, 2.8].map((x, i) => (
+        <group key={i}>
+          {/* Pillar shaft */}
+          <mesh position={[x, 2.5, -5.3]} castShadow>
+            <cylinderGeometry args={[0.22, 0.26, 5, 12]} />
+            <meshStandardMaterial color="#f0e0c0" roughness={0.5} />
+          </mesh>
+          {/* Pillar capital */}
+          <mesh position={[x, 5.05, -5.3]}>
+            <boxGeometry args={[0.6, 0.25, 0.6]} />
+            <meshStandardMaterial color="#c8a050" metalness={0.4} roughness={0.4} />
+          </mesh>
+          {/* Pillar base */}
+          <mesh position={[x, 0.08, -5.3]}>
+            <boxGeometry args={[0.55, 0.16, 0.55]} />
+            <meshStandardMaterial color="#c8a050" metalness={0.3} roughness={0.5} />
+          </mesh>
+        </group>
       ))}
 
-      {/* Temple courtyard */}
+      {/* ── Back inner pillars ────────────────────────────────────────── */}
+      {[-4.5, 4.5].map((x, i) => (
+        <group key={i}>
+          <mesh position={[x, 2.5, -13.5]} castShadow>
+            <cylinderGeometry args={[0.22, 0.26, 5, 12]} />
+            <meshStandardMaterial color="#f0e0c0" roughness={0.5} />
+          </mesh>
+          <mesh position={[x, 5.05, -13.5]}>
+            <boxGeometry args={[0.6, 0.25, 0.6]} />
+            <meshStandardMaterial color="#c8a050" metalness={0.4} roughness={0.4} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* ── Garbhagriha (sanctum) platform ───────────────────────────── */}
+      <mesh position={[0, 0.08, -12.5]} receiveShadow castShadow>
+        <boxGeometry args={[5, 0.16, 4]} />
+        <meshStandardMaterial color="#c8a050" metalness={0.3} roughness={0.5} />
+      </mesh>
+      <mesh position={[0, 0.18, -12.5]}>
+        <boxGeometry args={[4.4, 0.06, 3.4]} />
+        <meshStandardMaterial color="#ffd700" metalness={0.5} roughness={0.3} />
+      </mesh>
+      <Rangoli position={[0, 0.2, -12.5]} radius={1.6} />
+
+      {/* ── Interior wall decorations ────────────────────────────────── */}
+      {/* Back wall carvings / niches */}
+      {[-4, 0, 4].map((x, i) => (
+        <mesh key={i} position={[x, 2.5, -14.6]}>
+          <boxGeometry args={[2.2, 3, 0.15]} />
+          <meshStandardMaterial color="#e8c878" metalness={0.2} roughness={0.6} />
+        </mesh>
+      ))}
+      {/* Side wall relief strips */}
+      {[-1.5, 1.5].map((z, i) => (
+        <group key={i}>
+          <mesh position={[-6.55, 2.5, -10 + z * 2]}>
+            <boxGeometry args={[0.12, 3.5, 1.8]} />
+            <meshStandardMaterial color="#e8c878" metalness={0.2} roughness={0.6} />
+          </mesh>
+          <mesh position={[6.55, 2.5, -10 + z * 2]}>
+            <boxGeometry args={[0.12, 3.5, 1.8]} />
+            <meshStandardMaterial color="#e8c878" metalness={0.2} roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* ── Interior point lights ─────────────────────────────────────── */}
+      <pointLight position={[0, 3.5, -8]} color="#ffdd88" intensity={1.2} distance={12} />
+      <pointLight position={[0, 3.5, -12]} color="#ffaa44" intensity={1.0} distance={10} />
+      <pointLight position={[-4, 3, -10]} color="#ff8844" intensity={0.6} distance={8} />
+      <pointLight position={[4, 3, -10]} color="#ff8844" intensity={0.6} distance={8} />
+
+      {/* ── Temple courtyard (outside) ───────────────────────────────── */}
       <mesh position={[0, 0.02, -2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[14, 10]} />
+        <planeGeometry args={[16, 8]} />
         <meshStandardMaterial color="#d4b896" roughness={0.9} />
       </mesh>
 
-      {/* Central Ganesha idol */}
-      <GaneshaIdol position={[0, 0.4, -8]} variant="divine" size={1.2} showGlow />
+      {/* Central Ganesha idol on sanctum */}
+      <GaneshaIdol position={[0, 0.25, -13]} variant="divine" size={1.2} showGlow />
 
       {/* Rangoli patterns */}
-      <Rangoli position={[0, 0.03, -5]} radius={2} />
+      <Rangoli position={[0, 0.03, -5.5]} radius={2} />
       <Rangoli position={[-5, 0.03, -2]} radius={1} />
       <Rangoli position={[5, 0.03, -2]} radius={1} />
 
       {/* Decoration spots */}
       <TempleDecorationSpot id="tdec_1" position={[-3, 0, -6]} missionId="l4_decorate_temple" />
       <TempleDecorationSpot id="tdec_2" position={[3, 0, -6]} missionId="l4_decorate_temple" />
-      <TempleDecorationSpot id="tdec_3" position={[-5, 0, -3]} missionId="l4_decorate_temple" />
-      <TempleDecorationSpot id="tdec_4" position={[5, 0, -3]} missionId="l4_decorate_temple" />
-      <TempleDecorationSpot id="tdec_5" position={[0, 0, -3]} missionId="l4_decorate_temple" />
+      <TempleDecorationSpot id="tdec_3" position={[-5, 0, -9]} missionId="l4_decorate_temple" />
+      <TempleDecorationSpot id="tdec_4" position={[5, 0, -9]} missionId="l4_decorate_temple" />
+      <TempleDecorationSpot id="tdec_5" position={[0, 0, -7]} missionId="l4_decorate_temple" />
 
       {/* Flower arrangement spots */}
-      <FlowerArrangementSpot id="far_1" position={[-1.5, 0, -7]} missionId="l4_flower_arrangement" />
-      <FlowerArrangementSpot id="far_2" position={[1.5, 0, -7]} missionId="l4_flower_arrangement" />
-      <FlowerArrangementSpot id="far_3" position={[0, 0, -6.5]} missionId="l4_flower_arrangement" />
+      <FlowerArrangementSpot id="far_1" position={[-1.8, 0, -11]} missionId="l4_flower_arrangement" />
+      <FlowerArrangementSpot id="far_2" position={[1.8, 0, -11]} missionId="l4_flower_arrangement" />
+      <FlowerArrangementSpot id="far_3" position={[0, 0, -10.5]} missionId="l4_flower_arrangement" />
 
       {/* Mini-game trigger pillars */}
       <MiniGameTrigger
@@ -205,32 +330,52 @@ export default function Level4Temple({ onStartPuzzle, onStartMusic, onStartModak
         onActivate={() => onStartModak?.()}
       />
 
-      {/* Festival lights */}
+      {/* ── Festival lights ───────────────────────────────────────────── */}
+      {/* Inside temple */}
       <FestivalLights
-        points={[[-6, 5, -10], [-3, 5.5, -10], [0, 6, -10], [3, 5.5, -10], [6, 5, -10]]}
-        color="#ff8c00"
+        points={[[-5.5, 4.5, -6], [-2.5, 4.8, -8], [0, 5, -10], [2.5, 4.8, -8], [5.5, 4.5, -6]]}
+        color="#ffdd00"
       />
+      {/* Outside / entrance */}
       <FestivalLights
         points={[[-6, 4, -4], [-3, 4.5, -4], [0, 4.8, -4], [3, 4.5, -4], [6, 4, -4]]}
         color="#ffd700"
       />
+      <FestivalLights
+        points={[[-6, 5, -10], [-3, 5.5, -10], [0, 6, -10], [3, 5.5, -10], [6, 5, -10]]}
+        color="#ff8c00"
+      />
 
-      {/* Banners */}
-      <Banner position={[0, 7, -10]} width={10} color="#dc143c" />
-      <Banner position={[-5, 5, -4.5]} width={4} color="#ffd700" />
-      <Banner position={[5, 5, -4.5]} width={4} color="#ffd700" />
+      {/* ── Diyas ─────────────────────────────────────────────────────── */}
+      {/* Entrance row */}
+      {[-3, -2, -1, 0, 1, 2, 3].map((x, i) => (
+        <Diya key={i} position={[x * 0.8, 0, -4.5]} />
+      ))}
+      {/* Inner sanctum diyas */}
+      {[-2, -1, 0, 1, 2].map((x, i) => (
+        <Diya key={`inner_${i}`} position={[x * 1.1, 0.22, -10.7]} />
+      ))}
 
-      {/* Trees */}
+      {/* ── Banners ───────────────────────────────────────────────────── */}
+      <Banner position={[0, 4.6, -5.15]} width={7} color="#dc143c" />
+      <Banner position={[-5.5, 3.5, -9]} width={3} color="#ffd700" />
+      <Banner position={[5.5, 3.5, -9]} width={3} color="#ffd700" />
+      <Banner position={[0, 4.2, -14.7]} width={10} color="#dc143c" />
+
+      {/* ── Trees ─────────────────────────────────────────────────────── */}
       <Tree position={[-9, 0, -5]} height={5} />
       <Tree position={[9, 0, -5]} height={5} />
       <Tree position={[-9, 0, 3]} height={4} />
       <Tree position={[9, 0, 3]} height={4} />
 
-      {/* Diya rows */}
-      {[-3, -2, -1, 0, 1, 2, 3].map((x, i) => <Diya key={i} position={[x * 0.8, 0, -4.5]} />)}
+      {/* ── Marigolds along entrance ──────────────────────────────────── */}
+      <Marigold position={[-3.5, 0, -4.8]} color="#ff8c00" />
+      <Marigold position={[3.5, 0, -4.8]} color="#ffd700" />
+      <Marigold position={[-3.5, 0, -5.5]} color="#ff69b4" />
+      <Marigold position={[3.5, 0, -5.5]} color="#ff69b4" />
 
-      {/* NPCs */}
-      <NPC id="priest" position={[-2, 0, -7.5]} name="Panditji" outfit={2}
+      {/* ── NPCs ──────────────────────────────────────────────────────── */}
+      <NPC id="priest" position={[-1.5, 0, -11.5]} name="Panditji" outfit={2}
         dialogue={[
           { text: "Welcome to the temple! Please help decorate." },
           { text: "Ganesha's blessings await those who prepare with devotion." },

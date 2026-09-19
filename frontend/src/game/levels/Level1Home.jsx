@@ -321,27 +321,123 @@ export default function Level1Home({ onStartModakPrep, onOpenIdolSelector }) {
       <SceneLighting quality="medium" timeOfDay="day" />
       <Ground size={60} color="#c8a96e" />
 
-      {/* ── House ──────────────────────────────────────────── */}
-      <mesh position={[0, 1.5, -8]} castShadow receiveShadow>
-        <boxGeometry args={[12, 3, 8]} />
-        <meshStandardMaterial color="#f5deb3" roughness={0.8} />
+      {/* ── House — open front wall so interior is visible ─── */}
+
+      {/* Interior floor */}
+      <mesh position={[0, 0.02, -8]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[12, 8]} />
+        <meshStandardMaterial color="#e8d0a8" roughness={0.9} />
       </mesh>
+      {/* Interior floor tiles */}
+      {[-3, 0, 3].map((x, i) => (
+        <mesh key={i} position={[x, 0.03, -8]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[3.8, 7.8]} />
+          <meshStandardMaterial color={i % 2 === 0 ? '#dcc890' : '#e8d0a8'} roughness={0.8} />
+        </mesh>
+      ))}
+
+      {/* Back wall */}
+      <mesh position={[0, 1.5, -12]} castShadow receiveShadow>
+        <boxGeometry args={[12, 3, 0.25]} />
+        <meshStandardMaterial color="#f5deb3" roughness={0.8} side={2} />
+      </mesh>
+      {/* Left wall */}
+      <mesh position={[-6, 1.5, -8]} castShadow receiveShadow>
+        <boxGeometry args={[0.25, 3, 8]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.8} side={2} />
+      </mesh>
+      {/* Right wall */}
+      <mesh position={[6, 1.5, -8]} castShadow receiveShadow>
+        <boxGeometry args={[0.25, 3, 8]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.8} side={2} />
+      </mesh>
+      {/* Ceiling (double-sided so visible from inside) */}
+      <mesh position={[0, 3.05, -8]}>
+        <boxGeometry args={[12, 0.12, 8]} />
+        <meshStandardMaterial color="#e8c898" roughness={0.8} side={2} />
+      </mesh>
+      {/* Ceiling beams */}
+      {[-3.5, 0, 3.5].map((x, i) => (
+        <mesh key={i} position={[x, 2.96, -8]}>
+          <boxGeometry args={[0.3, 0.18, 8]} />
+          <meshStandardMaterial color="#b8823a" roughness={0.7} />
+        </mesh>
+      ))}
+
+      {/* Front wall — left section (beside door) */}
+      <mesh position={[-4.25, 1.5, -4]} castShadow receiveShadow>
+        <boxGeometry args={[3.5, 3, 0.25]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.8} side={2} />
+      </mesh>
+      {/* Front wall — right section */}
+      <mesh position={[4.25, 1.5, -4]} castShadow receiveShadow>
+        <boxGeometry args={[3.5, 3, 0.25]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.8} side={2} />
+      </mesh>
+      {/* Front wall — top beam over door opening */}
+      <mesh position={[0, 2.55, -4]}>
+        <boxGeometry args={[5, 0.9, 0.25]} />
+        <meshStandardMaterial color="#f0d9b0" roughness={0.8} side={2} />
+      </mesh>
+
+      {/* Roof */}
       <mesh position={[0, 3.5, -8]}>
         <coneGeometry args={[7.5, 2, 4]} />
         <meshStandardMaterial color="#dc143c" roughness={0.7} />
       </mesh>
-      <mesh position={[0, 0.9, -4.1]}>
-        <boxGeometry args={[1.2, 1.8, 0.1]} />
-        <meshStandardMaterial color="#8b4513" />
+      {/* Roof base trim */}
+      <mesh position={[0, 3.08, -8]}>
+        <boxGeometry args={[12.4, 0.2, 8.4]} />
+        <meshStandardMaterial color="#c81030" roughness={0.6} metalness={0.1} />
       </mesh>
-      <mesh position={[-3, 1.5, -4.1]}>
-        <boxGeometry args={[1, 0.8, 0.1]} />
+
+      {/* Door frame */}
+      <mesh position={[0, 0.9, -4.0]} castShadow>
+        <boxGeometry args={[1.2, 1.8, 0.12]} />
+        <meshStandardMaterial color="#8b4513" roughness={0.7} />
+      </mesh>
+      {/* Door step */}
+      <mesh position={[0, 0.06, -3.8]}>
+        <boxGeometry args={[1.6, 0.12, 0.4]} />
+        <meshStandardMaterial color="#c8a870" roughness={0.8} />
+      </mesh>
+
+      {/* Windows */}
+      <mesh position={[-3, 1.5, -4.0]}>
+        <boxGeometry args={[1, 0.8, 0.12]} />
         <meshStandardMaterial color="#87ceeb" transparent opacity={0.7} />
       </mesh>
-      <mesh position={[3, 1.5, -4.1]}>
-        <boxGeometry args={[1, 0.8, 0.1]} />
+      <mesh position={[3, 1.5, -4.0]}>
+        <boxGeometry args={[1, 0.8, 0.12]} />
         <meshStandardMaterial color="#87ceeb" transparent opacity={0.7} />
       </mesh>
+      {/* Window frames */}
+      {[-3, 3].map((x, i) => (
+        <mesh key={i} position={[x, 1.5, -3.95]}>
+          <boxGeometry args={[1.15, 0.95, 0.06]} />
+          <meshStandardMaterial color="#8b6914" roughness={0.7} wireframe={false} />
+        </mesh>
+      ))}
+
+      {/* Interior wall decorations — back wall */}
+      <mesh position={[0, 1.8, -11.85]}>
+        <boxGeometry args={[3, 1.5, 0.08]} />
+        <meshStandardMaterial color="#e8c050" metalness={0.3} roughness={0.5} />
+      </mesh>
+      {/* Side wall shelves */}
+      <mesh position={[-5.85, 1.6, -8]}>
+        <boxGeometry args={[0.08, 0.1, 2.5]} />
+        <meshStandardMaterial color="#c8a050" roughness={0.6} />
+      </mesh>
+      <mesh position={[5.85, 1.6, -8]}>
+        <boxGeometry args={[0.08, 0.1, 2.5]} />
+        <meshStandardMaterial color="#c8a050" roughness={0.6} />
+      </mesh>
+
+      {/* Interior point lights */}
+      <pointLight position={[0, 2.5, -8]} color="#ffdd88" intensity={1.0} distance={10} />
+      <pointLight position={[-3, 2.2, -10]} color="#ffcc66" intensity={0.5} distance={6} />
+      <pointLight position={[3, 2.2, -10]} color="#ffcc66" intensity={0.5} distance={6} />
 
       {/* ── Courtyard ──────────────────────────────────────── */}
       <mesh position={[0, 0.02, -1]} rotation={[-Math.PI / 2, 0, 0]}>

@@ -4,20 +4,20 @@ import { initPlayer, startAutoSave, stopAutoSave } from './game/systems/SaveServ
 import inputManager from './game/systems/InputManager';
 
 // Pages
-import MainMenu            from './pages/MainMenu';
-import HowToPlay           from './pages/HowToPlay';
-import Tutorial            from './pages/Tutorial';
-import LevelSelect         from './pages/LevelSelect';
-import LevelComplete       from './pages/LevelComplete';
-import FinalResults        from './pages/FinalResults';
-import Rewards             from './pages/Rewards';
+import MainMenu from './pages/MainMenu';
+import HowToPlay from './pages/HowToPlay';
+import Tutorial from './pages/Tutorial';
+import LevelSelect from './pages/LevelSelect';
+import LevelComplete from './pages/LevelComplete';
+import FinalResults from './pages/FinalResults';
+import Rewards from './pages/Rewards';
 import CharacterCustomization from './pages/CharacterCustomization';
-import Settings            from './pages/Settings';
-import PauseMenu           from './pages/PauseMenu';
+import Settings from './pages/Settings';
+import PauseMenu from './pages/PauseMenu';
 
 // Game
 import GameScene from './game/GameScene';
-import HUD       from './components/HUD';
+import HUD from './components/HUD';
 
 /* ─────────────────────────────────────────────────────────────────────────
    LOADING SCREEN
@@ -66,7 +66,7 @@ function usePauseInput() {
       if (e.code !== 'Escape') return;
       // Use Zustand state directly — screen captured in closure is always fresh
       // because this effect re-runs whenever screen changes
-      if (screen === 'playing')   setScreen('paused');
+      if (screen === 'playing') setScreen('paused');
       else if (screen === 'paused') setScreen('playing');
     };
     window.addEventListener('keydown', handler);
@@ -110,33 +110,33 @@ export default function App() {
         e.preventDefault();
       }
     };
-    document.addEventListener('touchmove',      prevent, { passive: false });
-    document.addEventListener('gesturestart',   prevent, { passive: false });
-    document.addEventListener('gesturechange',  prevent, { passive: false });
+    document.addEventListener('touchmove', prevent, { passive: false });
+    document.addEventListener('gesturestart', prevent, { passive: false });
+    document.addEventListener('gesturechange', prevent, { passive: false });
     return () => {
-      document.removeEventListener('touchmove',     prevent);
-      document.removeEventListener('gesturestart',  prevent);
+      document.removeEventListener('touchmove', prevent);
+      document.removeEventListener('gesturestart', prevent);
       document.removeEventListener('gesturechange', prevent);
     };
   }, []);
 
-  const handlePause = useCallback(() => setScreen('paused'),   [setScreen]);
+  const handlePause = useCallback(() => setScreen('paused'), [setScreen]);
 
   if (loading) return <LoadingScreen />;
 
   // The Canvas stays mounted for all gameplay screens so we never
   // re-trigger the full 3-D scene teardown/setup.
   const gameScreens = new Set(['playing', 'paused', 'tutorial', 'levelcomplete']);
-  const showGame    = gameScreens.has(screen);
+  const showGame = gameScreens.has(screen);
 
   return (
     <div
-      className="relative w-full h-full overflow-hidden"
+      className="relative w-full h-full"
       style={{ background: '#110820' }}
     >
       {/* ── 3-D world ───────────────────────────────────────────────── */}
       {showGame && (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0" style={{ touchAction: 'none' }}>
           <Suspense fallback={<LoadingScreen />}>
             <GameScene />
           </Suspense>
@@ -149,16 +149,16 @@ export default function App() {
       )}
 
       {/* ── Screen overlays ─────────────────────────────────────────── */}
-      {screen === 'mainmenu'   && <MainMenu />}
-      {screen === 'howtoplay'  && <HowToPlay />}
-      {screen === 'tutorial'   && <Tutorial />}
+      {screen === 'mainmenu' && <MainMenu />}
+      {screen === 'howtoplay' && <HowToPlay />}
+      {screen === 'tutorial' && <Tutorial />}
       {screen === 'levelselect' && <LevelSelect />}
       {screen === 'levelcomplete' && showGame && <LevelComplete />}
-      {screen === 'paused'     && <PauseMenu />}
-      {screen === 'results'    && <FinalResults />}
-      {screen === 'rewards'    && <Rewards />}
-      {screen === 'character'  && <CharacterCustomization />}
-      {screen === 'settings'   && <Settings />}
+      {screen === 'paused' && <PauseMenu />}
+      {screen === 'results' && <FinalResults />}
+      {screen === 'rewards' && <Rewards />}
+      {screen === 'character' && <CharacterCustomization />}
+      {screen === 'settings' && <Settings />}
     </div>
   );
 }

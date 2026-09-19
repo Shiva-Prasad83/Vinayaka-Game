@@ -31,10 +31,10 @@ function LevelContent({ level, playerPositionRef, onStartPuzzle, onStartMusic, o
 }
 
 const SHADOW_QUALITY = {
-  low:   false,
+  low: false,
   medium: true,
-  high:   true,
-  ultra:  true,
+  high: true,
+  ultra: true,
 };
 
 // Atomic level-complete flag — prevents double-fire across effect re-runs
@@ -42,7 +42,7 @@ const levelCompleteFired = new Set();
 
 export default function GameScene() {
   const playerPositionRef = useRef({ x: 0, y: 0, z: 3 });
-  const playerAngleRef    = useRef(0);
+  const playerAngleRef = useRef(0);
 
   const [activeMiniGame, setActiveMiniGame] = useState(null);
   // Idol selector lives outside Canvas — renders as a proper React portal
@@ -66,8 +66,22 @@ export default function GameScene() {
   }, [currentLevel, completedMissions.length]); // length as proxy for change
 
   // ── Watch for level completion ─────────────────────────────────────────
-  // FIXED: Atomic guard using module-level Set prevents double-fire
+  // Only fires if the level wasn't already completed before entering it.
+  // This prevents replaying a completed level from immediately auto-advancing.
+  const levelAlreadyCompletedOnEntry = useRef(false);
+
   useEffect(() => {
+    // Record whether this level was completed BEFORE the player started playing it
+    levelAlreadyCompletedOnEntry.current =
+      useGameStore.getState().completedLevels.includes(currentLevel);
+    // Also clear the atomic fired-set for this level on entry
+    levelCompleteFired.delete(currentLevel);
+  }, [currentLevel]);
+
+  useEffect(() => {
+    // Never auto-advance a level the player had already completed when they entered it
+    if (levelAlreadyCompletedOnEntry.current) return;
+
     const levelMissions = LEVEL_MISSIONS[currentLevel] ?? [];
     if (levelMissions.length === 0) return;
 
@@ -109,7 +123,7 @@ export default function GameScene() {
 
   const handlePosUpdate = useCallback((pos, angle) => {
     playerPositionRef.current = pos;
-    playerAngleRef.current    = angle;
+    playerAngleRef.current = angle;
   }, []);
 
   const closeMiniGame = useCallback(() => {
@@ -124,8 +138,8 @@ export default function GameScene() {
         camera={{ position: [0, 4, 10], fov: 60, near: 0.1, far: 200 }}
         gl={{ antialias: quality !== 'low', powerPreference: 'high-performance' }}
         dpr={
-          quality === 'low'   ? 0.75 :
-          quality === 'ultra' ? Math.min(window.devicePixelRatio, 2) : 1
+          quality === 'low' ? 0.75 :
+            quality === 'ultra' ? Math.min(window.devicePixelRatio, 2) : 1
         }
         style={{ position: 'absolute', inset: 0 }}
       >
@@ -133,9 +147,9 @@ export default function GameScene() {
           <LevelContent
             level={currentLevel}
             playerPositionRef={playerPositionRef}
-            onStartPuzzle={   () => setActiveMiniGame('puzzle')}
-            onStartMusic={    () => setActiveMiniGame('music')}
-            onStartModak={    () => setActiveMiniGame('modak')}
+            onStartPuzzle={() => setActiveMiniGame('puzzle')}
+            onStartMusic={() => setActiveMiniGame('music')}
+            onStartModak={() => setActiveMiniGame('modak')}
             onStartModakPrep={() => setActiveMiniGame('modakprep')}
             onOpenIdolSelector={() => setShowIdolSelector(true)}
           />
@@ -156,9 +170,9 @@ export default function GameScene() {
       </Canvas>
 
       {/* Mini-game overlays — all rendered OUTSIDE Canvas so they get proper DOM stacking */}
-      {activeMiniGame === 'puzzle'    && <DecorationPuzzle onComplete={closeMiniGame} />}
-      {activeMiniGame === 'music'     && <MusicChallenge   onComplete={closeMiniGame} />}
-      {activeMiniGame === 'modak'     && <ModakChallenge   onComplete={closeMiniGame} />}
+      {activeMiniGame === 'puzzle' && <DecorationPuzzle onComplete={closeMiniGame} />}
+      {activeMiniGame === 'music' && <MusicChallenge onComplete={closeMiniGame} />}
+      {activeMiniGame === 'modak' && <ModakChallenge onComplete={closeMiniGame} />}
       {activeMiniGame === 'modakprep' && <ModakPreparation onComplete={closeMiniGame} />}
 
       {/* Idol selector — rendered outside Canvas so pointer events work correctly */}

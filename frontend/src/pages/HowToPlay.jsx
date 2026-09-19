@@ -1,33 +1,88 @@
+import { useState } from 'react';
 import useGameStore from '../store/useGameStore';
+import { PageShell, PageHeader, GoldButton, OrangeButton, BackButton, GemDivider } from '../components/PageShell';
 
-const CARDS = [
-  { icon: '🎯', title: 'Complete Missions', text: 'Finish festival activities as directed by your mission tracker.' },
-  { icon: '⭐', title: 'Collect Points',    text: 'Decorate, collect items, and complete challenges to earn stars.' },
-  { icon: '🐘', title: 'Help Ganesha',      text: 'Prepare the festival — cook modaks, place diyas, decorate!' },
-  { icon: '🌱', title: 'Go Eco-Friendly',   text: 'Choose natural materials to earn the Eco Champion badge.' },
+const OBJECTIVES = [
+  { icon: '🎯', title: 'Complete Missions', text: 'Follow your mission tracker and finish festival activities in each level.', color: '#ff8c00' },
+  { icon: '⭐', title: 'Earn Stars', text: 'Decorate, collect items, and complete challenges to earn stars & score.', color: '#ffd700' },
+  { icon: '🐘', title: 'Help Ganesha', text: 'Prepare the festival — cook modaks, place diyas, and decorate the home!', color: '#ff69b4' },
+  { icon: '🌱', title: 'Go Eco-Friendly', text: 'Choose natural materials to earn the Eco Champion badge and green score.', color: '#4ade80' },
 ];
 
 const CONTROLS = [
-  { keys: ['W','A','S','D'],    label: 'Move',       mobile: 'Left joystick' },
-  { keys: ['Mouse'],            label: 'Camera',     mobile: 'Swipe right side' },
-  { keys: ['E'],                label: 'Interact',   mobile: 'INTERACT button' },
-  { keys: ['Shift'],            label: 'Run',        mobile: 'Push joystick far' },
-  { keys: ['Space'],            label: 'Jump',       mobile: 'JUMP button' },
-  { keys: ['Esc'],              label: 'Pause',      mobile: '☰ button' },
+  { keys: ['W', 'A', 'S', 'D'], label: 'Move', mobile: '🕹️ Left joystick' },
+  { keys: ['Mouse'], label: 'Camera', mobile: '👆 Swipe right side' },
+  { keys: ['E'], label: 'Interact', mobile: '✋ INTERACT button' },
+  { keys: ['Shift'], label: 'Run', mobile: '🕹️ Push joystick far' },
+  { keys: ['Space'], label: 'Jump', mobile: '⬆️ JUMP button' },
+  { keys: ['Esc'], label: 'Pause/Menu', mobile: '☰ Pause button' },
 ];
 
 const SCORING = [
-  ['Mission',      '+100 ⭐'],
-  ['Decoration',   '+50 ⭐'],
-  ['Puzzle',       '+100 ⭐'],
-  ['Modak',        '+10 ⭐'],
-  ['Eco Action',   '+100 🌱'],
-  ['Festival End', '+1000 ⭐'],
+  { action: 'Complete Mission', points: '+100 ⭐', color: '#ffd700' },
+  { action: 'Decoration', points: '+50 ⭐', color: '#ff8c00' },
+  { action: 'Puzzle Complete', points: '+100 ⭐', color: '#9370db' },
+  { action: 'Modak Collected', points: '+10 ⭐', color: '#f59e0b' },
+  { action: 'Eco Action', points: '+100 🌱', color: '#4ade80' },
+  { action: 'Level Complete', points: '+500 ⭐', color: '#ff8c00' },
+  { action: 'Festival End', points: '+1000 ⭐', color: '#ffd700' },
+];
+
+const LEVELS_PREVIEW = [
+  { icon: '🏠', name: 'Home', hint: 'Start the preparations — choose your idol!' },
+  { icon: '🛣️', name: 'Street', hint: 'Invite the neighbourhood to celebrate.' },
+  { icon: '🛍️', name: 'Market', hint: 'Shop for flowers, diyas, and sweets.' },
+  { icon: '🛕', name: 'Temple', hint: 'Decorate and play temple mini-games.' },
+  { icon: '🎉', name: 'Grand Festival', hint: 'Place the grand idol and celebrate!' },
 ];
 
 function KeyBadge({ k }) {
   return (
-    <span className="key-hint" style={{ fontSize: 10 }}>{k}</span>
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      minWidth: 26, height: 26, padding: '0 7px', borderRadius: 7,
+      background: 'rgba(255,255,255,0.1)',
+      border: '1px solid rgba(255,255,255,0.22)',
+      borderBottom: '2px solid rgba(255,255,255,0.12)',
+      fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.85)',
+      fontFamily: 'monospace',
+    }}>
+      {k}
+    </span>
+  );
+}
+
+function ObjectiveCard({ obj, index }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      style={{
+        borderRadius: 20, padding: '18px 14px',
+        border: `1.5px solid ${hovered ? obj.color + '50' : obj.color + '20'}`,
+        background: hovered ? `${obj.color}12` : `${obj.color}07`,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+        textAlign: 'center', cursor: 'default',
+        transform: hovered ? 'translateY(-2px)' : 'none',
+        transition: 'all 0.2s ease',
+        boxShadow: hovered ? `0 8px 24px ${obj.color}18` : 'none',
+        animation: `scaleIn 0.4s ${index * 0.08}s both`,
+      }}
+    >
+      <div style={{
+        width: 52, height: 52, borderRadius: 16,
+        background: `radial-gradient(circle, ${obj.color}35 0%, ${obj.color}10 70%)`,
+        border: `1px solid ${obj.color}30`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 26,
+        boxShadow: `0 0 14px ${obj.color}25`,
+      }}>
+        {obj.icon}
+      </div>
+      <span style={{ color: obj.color, fontSize: 12, fontWeight: 800, lineHeight: 1.2 }}>{obj.title}</span>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, lineHeight: 1.6, margin: 0 }}>{obj.text}</p>
+    </div>
   );
 }
 
@@ -35,102 +90,129 @@ export default function HowToPlay() {
   const { setScreen } = useGameStore();
 
   return (
-    <div
-      className="w-full h-full overflow-y-auto"
-      style={{ background: 'linear-gradient(160deg,#110820 0%,#0c0618 100%)' }}
-    >
-      <div className="max-w-md mx-auto px-4 py-6">
+    <PageShell>
+      <PageHeader
+        icon="📖"
+        title="How to Play"
+        subtitle="Everything you need to know"
+        onBack={() => setScreen('mainmenu')}
+      />
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <button
-            onClick={() => setScreen('mainmenu')}
-            className="glass-gold rounded-xl w-9 h-9 flex items-center justify-center text-white/70 hover:text-yellow-400 active:scale-90 transition-all flex-shrink-0"
-          >
-            ←
-          </button>
-          <div>
-            <h1 className="text-yellow-400 text-xl font-black leading-none">How to Play</h1>
-            <p className="text-white/35 text-[11px] mt-0.5">Everything you need to know</p>
+      {/* Hero banner */}
+      <div style={{
+        borderRadius: 22, padding: '18px 20px', marginBottom: 16,
+        background: 'linear-gradient(135deg, rgba(255,140,0,0.15), rgba(255,215,0,0.08), rgba(147,112,219,0.1))',
+        border: '1px solid rgba(255,215,0,0.2)',
+        display: 'flex', alignItems: 'center', gap: 16,
+        animation: 'slideDown 0.4s both',
+      }}>
+        <span style={{ fontSize: 44, flexShrink: 0, filter: 'drop-shadow(0 0 12px rgba(255,200,0,0.6))' }}>🐘</span>
+        <div>
+          <div style={{ color: '#ffd700', fontSize: 16, fontWeight: 900, marginBottom: 4 }}>
+            Vinayaka Chavithi Festival
           </div>
+          <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+            Help celebrate Ganesha's arrival across 5 beautiful levels — from home preparations to the grand festival stage!
+          </p>
         </div>
+      </div>
 
-        {/* Objective cards */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {CARDS.map((c, i) => (
-            <div
-              key={i}
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,215,0,0.12)',
-                borderRadius: 18,
-                padding: '16px 12px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 8,
-                textAlign: 'center',
-              }}
-            >
-              <span style={{ fontSize: 32 }}>{c.icon}</span>
-              <span className="text-yellow-400 text-xs font-bold leading-tight">{c.title}</span>
-              <p className="text-white/50 text-[10px] leading-relaxed">{c.text}</p>
+      {/* Objectives */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+          🎯 Your Goals
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {OBJECTIVES.map((o, i) => <ObjectiveCard key={i} obj={o} index={i} />)}
+        </div>
+      </div>
+
+      {/* Level journey */}
+      <div style={{
+        borderRadius: 20, padding: '16px', marginBottom: 14,
+        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,215,0,0.12)',
+      }}>
+        <div style={{ color: '#ffd700', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
+          🗺️ Your Journey
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {LEVELS_PREVIEW.map((lv, i) => (
+            <div key={i}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+                  background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 18,
+                }}>
+                  {lv.icon}
+                </div>
+                <div>
+                  <div style={{ color: '#f5e6c8', fontSize: 13, fontWeight: 800 }}>
+                    Level {i + 1}: {lv.name}
+                  </div>
+                  <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginTop: 1 }}>{lv.hint}</div>
+                </div>
+              </div>
+              {i < LEVELS_PREVIEW.length - 1 && (
+                <div style={{ marginLeft: 17, width: 2, height: 8, background: 'rgba(255,215,0,0.15)', borderRadius: 1 }} />
+              )}
             </div>
           ))}
         </div>
-
-        {/* Controls */}
-        <div
-          className="rounded-2xl mb-4"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: '16px 18px' }}
-        >
-          <div className="text-yellow-400 text-xs font-bold tracking-wider uppercase mb-3">🎮 Controls</div>
-          <div className="flex flex-col gap-2">
-            {CONTROLS.map((c, i) => (
-              <div key={i} className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  {c.keys.map(k => <KeyBadge key={k} k={k} />)}
-                  <span className="text-white/60 text-xs ml-1">{c.label}</span>
-                </div>
-                <span className="text-white/30 text-[10px]">{c.mobile}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Scoring */}
-        <div
-          className="rounded-2xl mb-5"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: '16px 18px' }}
-        >
-          <div className="text-yellow-400 text-xs font-bold tracking-wider uppercase mb-3">⭐ Scoring</div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-            {SCORING.map(([k, v], i) => (
-              <div key={i} className="flex justify-between items-center">
-                <span className="text-white/50 text-xs">{k}</span>
-                <span className="text-yellow-400 text-xs font-bold">{v}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <button
-          onClick={() => setScreen('tutorial')}
-          className="w-full py-4 rounded-2xl btn-orange font-black text-lg mb-3"
-          style={{ boxShadow: '0 0 24px rgba(255,140,0,0.2)' }}
-        >
-          🐘 Start Festival!
-        </button>
-        <button
-          onClick={() => setScreen('mainmenu')}
-          className="w-full py-3 rounded-xl btn-glass font-bold text-sm"
-        >
-          ← Back
-        </button>
-
-        <div style={{ height: 'env(safe-area-inset-bottom,12px)' }} />
       </div>
-    </div>
+
+      {/* Controls */}
+      <div style={{
+        borderRadius: 20, padding: '16px 18px', marginBottom: 14,
+        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(147,112,219,0.2)',
+      }}>
+        <div style={{ color: '#9370db', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
+          🎮 Controls
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {CONTROLS.map((c, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {c.keys.map(k => <KeyBadge key={k} k={k} />)}
+                <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginLeft: 4 }}>{c.label}</span>
+              </div>
+              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11 }}>{c.mobile}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scoring */}
+      <div style={{
+        borderRadius: 20, padding: '16px 18px', marginBottom: 18,
+        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,140,0,0.15)',
+      }}>
+        <div style={{ color: '#ff8c00', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 12 }}>
+          ⭐ Scoring Guide
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {SCORING.map((s, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: s.color, boxShadow: `0 0 4px ${s.color}`,
+                }} />
+                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>{s.action}</span>
+              </div>
+              <span style={{ color: s.color, fontSize: 13, fontWeight: 800 }}>{s.points}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <GemDivider />
+
+      <OrangeButton icon="🐘" onClick={() => setScreen('tutorial')} style={{ marginBottom: 10 }}>
+        Start Festival!
+      </OrangeButton>
+      <BackButton onClick={() => setScreen('mainmenu')} />
+    </PageShell>
   );
 }
