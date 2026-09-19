@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
-import react        from '@vitejs/plugin-react';
-import tailwindcss  from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
   // Load .env.local / .env so we can read VITE_API_URL even at config time
@@ -31,16 +31,24 @@ export default defineConfig(({ mode }) => {
 
     // ── Build ────────────────────────────────────────────────────────────
     build: {
-      target:               'esnext',
+      target: 'esnext',
       // Suppress the "chunk > 500 kB" advisory — expected for Three.js games
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
         output: {
-          // Split vendor libs into a separate chunk for better browser caching
-          manualChunks: {
-            'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-            'react-vendor': ['react', 'react-dom'],
-            'state-vendor': ['zustand'],
+          // Vite 8 (rolldown) requires manualChunks to be a function, not an object
+          manualChunks: (id) => {
+            if (id.includes('node_modules/three') ||
+              id.includes('node_modules/@react-three')) {
+              return 'three-vendor';
+            }
+            if (id.includes('node_modules/react') ||
+              id.includes('node_modules/react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('node_modules/zustand')) {
+              return 'state-vendor';
+            }
           },
         },
       },
