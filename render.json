@@ -6,6 +6,7 @@
       "runtime": "node",
       "region": "singapore",
       "plan": "free",
+      "rootDir": "backend",
       "buildCommand": "npm install --omit=dev",
       "startCommand": "npm start",
       "healthCheckPath": "/api/health",
